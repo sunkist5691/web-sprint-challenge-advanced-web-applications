@@ -1,14 +1,67 @@
-import React from "react";
+import React, { useState } from 'react'
+import { Redirect } from 'react-router-dom'
+import axios from 'axios'
+import './Login.css'
 
-const Login = () => {
-  // make a post request to retrieve a token from the api
-  // when you have handled the token, navigate to the BubblePage route
-  return (
-    <>
-      <h1>Welcome to the Bubble App!</h1>
-      <p>Build a login page here</p>
-    </>
-  );
-};
 
-export default Login;
+const Login = (props) => {
+
+   const token = localStorage.getItem('token')
+
+   const [info, setInfo] = useState({
+      username: '',
+      password: '',
+  
+    })
+  
+    const handleChange = (e) => {
+  
+      setInfo({
+        ...info,
+        [e.target.name]: e.target.value,
+      })
+  
+    }
+  
+    const handleSubmit = (e) => {
+      
+      e.preventDefault()
+
+      axios
+         .post('http://localhost:5000/api/login', info)
+         .then(res => {
+            localStorage.setItem('token', res.data.payload)
+            props.history.push('/bubblepage')
+         })
+      // res.data.payload is saving a 'token' information
+
+      setInfo({
+        username: '',
+        password: '',
+      })
+  
+    }
+
+   if(token){
+      return <Redirect to='bubblepage' />
+   }
+
+   return (
+   <div className="login">
+      <h1>Login</h1>
+      <form className='login___form' onSubmit={handleSubmit}>
+         <label className='login___label' htmlFor='username'>
+            Username
+            <input id='username' name='username' value={info.username} onChange={handleChange} autoComplete='off'/>
+         </label>
+         <label className='login___label' htmlFor='password' autoComplete='off'>
+            Password
+            <input id='password' type='password' name='password' value={info.password} onChange={handleChange} autoComplete='off'/>
+         </label>
+         <button type='submit'>Login</button>
+      </form>
+   </div>
+   )
+}
+
+export default Login
