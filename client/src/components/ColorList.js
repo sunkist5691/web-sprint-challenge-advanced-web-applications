@@ -27,10 +27,12 @@ const ColorList = ({ colors, updateColors }) => {
       .put(`/api/colors/${colorToEdit.id}`, colorToEdit)
       .then(res => {
         console.log(res)
-        updateColors([
-          ...colors,
-          colorToEdit
-        ])
+      })
+    
+    axiosWithAuth()
+      .get('/api/colors')
+      .then(res => {
+        updateColors(res.data)
       })
     // Make a put request to save your updated color
     // think about where will you get the id from...
